@@ -9,6 +9,7 @@ export interface Visitor<R> {
   visitUnaryExpr(expr: Expr.Unary): R;
   visitVariableExpr(expr: Expr.Variable): R;
   visitAssignExpr(expr: Expr.Assign): R;
+  visitLogicalExpr(expr: Expr.Logical): R;
 }
 
 export abstract class Expr {
@@ -83,6 +84,20 @@ export namespace Expr {
 
     accept<R>(visitor: Visitor<R>): R {
       return visitor.visitAssignExpr(this);
+    }
+  }
+
+  export class Logical extends Expr {
+    constructor(
+      public readonly left: Expr,
+      public readonly operator: Token,
+      public readonly right: Expr,
+    ) {
+      super();
+    }
+
+    accept<R>(visitor: Visitor<R>): R {
+      return visitor.visitLogicalExpr(this);
     }
   }
 }

@@ -30,6 +30,10 @@ export class AstPrinter implements Visitor<string> {
     return this.parenthesize(`= ${expr.name.lexeme}`, expr.value);
   }
 
+  visitLogicalExpr(expr: Expr.Logical): string {
+    return this.parenthesize(expr.operator.lexeme, expr.left, expr.right);
+  }
+
   private parenthesize(name: string, ...exprs: Expr[]): string {
     return `(${name} ${exprs.map(e => e.accept(this)).join(' ')})`;
   }

@@ -6,7 +6,7 @@
 
 ## Next Step
 
-**Step 07** — `steps/07-control-flow.md`
+**Step 08** — `steps/08-functions.md`
 
 ---
 
@@ -20,7 +20,7 @@
 | 04   | Parsing Expressions            | ✅ Complete  |
 | 05   | Evaluating Expressions         | ✅ Complete |
 | 06   | Statements and State           | ✅ Complete |
-| 07   | Control Flow                   | ⬜ Pending  |
+| 07   | Control Flow                   | ✅ Complete |
 | 08   | Functions                      | ⬜ Pending  |
 | 09   | Resolving and Binding          | ⬜ Pending  |
 | 10   | Classes                        | ⬜ Pending  |
