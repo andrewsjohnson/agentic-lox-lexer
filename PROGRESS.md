@@ -6,7 +6,7 @@
 
 ## Next Step
 
-**Step 05** — `steps/05-evaluating-expressions.md`
+**Step 06** — `steps/06-statements-and-state.md`
 
 ---
 
@@ -18,7 +18,7 @@
 | 02   | Scanning / Lexer               | ✅ Complete |
 | 03   | AST Representation             | ✅ Complete |
 | 04   | Parsing Expressions            | ✅ Complete  |
-| 05   | Evaluating Expressions         | ⬜ Pending  |
+| 05   | Evaluating Expressions         | ✅ Complete |
 | 06   | Statements and State           | ⬜ Pending  |
 | 07   | Control Flow                   | ⬜ Pending  |
 | 08   | Functions                      | ⬜ Pending  |
