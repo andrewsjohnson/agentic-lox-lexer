@@ -119,6 +119,29 @@ steps/              # Implementation guides (this directory)
 
 ---
 
+## Progress Tracking
+
+Implementation progress is recorded in **`PROGRESS.md`** at the repository root.
+
+### At the start of every session
+
+1. Read `PROGRESS.md` to find the **Next Step** section — that tells you exactly
+   which step to work on next.
+2. Do not scan the source tree or run tests to infer progress; trust
+   `PROGRESS.md` as the authoritative record.
+
+### After completing a step
+
+Update `PROGRESS.md` immediately before committing:
+
+1. Change the completed step's status from `⬜ Pending` to `✅ Complete`.
+2. Update the **Next Step** section to point at the following step file.
+3. Update the **Last updated** date at the top of the file.
+
+Keep the edit minimal — only touch the lines that change.
+
+---
+
 ## Step Completion Checklist
 
 Before marking a step as done, verify:
@@ -127,6 +150,7 @@ Before marking a step as done, verify:
 - [ ] No TypeScript errors (`npm run typecheck`)
 - [ ] No regressions in previous tests
 - [ ] Implementation matches the book's chapter behavior
+- [ ] `PROGRESS.md` updated to reflect the completed step
 
 ---
 
