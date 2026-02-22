@@ -1,15 +1,20 @@
 import { Scanner } from '../../src/lox/Scanner';
 import { Parser } from '../../src/lox/Parser';
-import { Interpreter } from '../../src/lox/Interpreter';
+import { Interpreter, LoxValue } from '../../src/lox/Interpreter';
 import { RuntimeError } from '../../src/lox/RuntimeError';
+import { Stmt } from '../../src/lox/Stmt';
 
-function evaluate(source: string) {
-  const scanner = new Scanner(source);
+function evaluate(source: string): LoxValue {
+  const scanner = new Scanner(source + ';');
   const tokens = scanner.scanTokens();
   const parser = new Parser(tokens);
-  const expr = parser.parse()!;
+  const stmts = parser.parse();
   const interpreter = new Interpreter();
-  return interpreter.interpret(expr);
+  const stmt = stmts[0];
+  if (stmt instanceof Stmt.Expression) {
+    return interpreter.evaluate(stmt.expression);
+  }
+  return null;
 }
 
 describe('Interpreter — literals', () => {
