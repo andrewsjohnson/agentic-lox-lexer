@@ -13,6 +13,7 @@ export type LoxValue = null | boolean | number | string | LoxCallable;
 export class Interpreter implements Visitor<LoxValue>, StmtVisitor<void> {
   public readonly globals = new Environment();
   private environment = this.globals;
+  private locals = new Map<Expr, number>();
 
   constructor() {
     this.globals.define('clock', {
@@ -20,6 +21,10 @@ export class Interpreter implements Visitor<LoxValue>, StmtVisitor<void> {
       call: () => Date.now() / 1000,
       toString: () => '<native fn>',
     } satisfies LoxCallable);
+  }
+
+  resolve(expr: Expr, depth: number): void {
+    this.locals.set(expr, depth);
   }
 
   interpret(statements: Stmt[]): void {
@@ -73,12 +78,17 @@ export class Interpreter implements Visitor<LoxValue>, StmtVisitor<void> {
   }
 
   visitVariableExpr(expr: Expr.Variable): LoxValue {
-    return this.environment.get(expr.name);
+    return this.lookUpVariable(expr.name, expr);
   }
 
   visitAssignExpr(expr: Expr.Assign): LoxValue {
     const value = this.evaluate(expr.value);
-    this.environment.assign(expr.name, value);
+    const distance = this.locals.get(expr);
+    if (distance !== undefined) {
+      this.environment.assignAt(distance, expr.name, value);
+    } else {
+      this.globals.assign(expr.name, value);
+    }
     return value;
   }
 
@@ -197,6 +207,14 @@ export class Interpreter implements Visitor<LoxValue>, StmtVisitor<void> {
 
   evaluate(expr: Expr): LoxValue {
     return expr.accept(this);
+  }
+
+  private lookUpVariable(name: Token, expr: Expr): LoxValue {
+    const distance = this.locals.get(expr);
+    if (distance !== undefined) {
+      return this.environment.getAt(distance, name.lexeme);
+    }
+    return this.globals.get(name);
   }
 
   private isTruthy(value: LoxValue): boolean {
