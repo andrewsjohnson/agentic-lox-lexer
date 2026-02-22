@@ -6,6 +6,8 @@ export interface StmtVisitor<R> {
   visitPrintStmt(stmt: Stmt.Print): R;
   visitVarStmt(stmt: Stmt.Var): R;
   visitBlockStmt(stmt: Stmt.Block): R;
+  visitIfStmt(stmt: Stmt.If): R;
+  visitWhileStmt(stmt: Stmt.While): R;
 }
 
 export abstract class Stmt {
@@ -53,6 +55,33 @@ export namespace Stmt {
 
     accept<R>(visitor: StmtVisitor<R>): R {
       return visitor.visitBlockStmt(this);
+    }
+  }
+
+  export class If extends Stmt {
+    constructor(
+      public readonly condition: Expr,
+      public readonly thenBranch: Stmt,
+      public readonly elseBranch: Stmt | null,
+    ) {
+      super();
+    }
+
+    accept<R>(visitor: StmtVisitor<R>): R {
+      return visitor.visitIfStmt(this);
+    }
+  }
+
+  export class While extends Stmt {
+    constructor(
+      public readonly condition: Expr,
+      public readonly body: Stmt,
+    ) {
+      super();
+    }
+
+    accept<R>(visitor: StmtVisitor<R>): R {
+      return visitor.visitWhileStmt(this);
     }
   }
 }

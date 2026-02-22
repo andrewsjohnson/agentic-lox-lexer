@@ -36,6 +36,20 @@ export class Interpreter implements Visitor<LoxValue>, StmtVisitor<void> {
     this.executeBlock(stmt.statements, new Environment(this.environment));
   }
 
+  visitIfStmt(stmt: Stmt.If): void {
+    if (this.isTruthy(this.evaluate(stmt.condition))) {
+      this.execute(stmt.thenBranch);
+    } else if (stmt.elseBranch !== null) {
+      this.execute(stmt.elseBranch);
+    }
+  }
+
+  visitWhileStmt(stmt: Stmt.While): void {
+    while (this.isTruthy(this.evaluate(stmt.condition))) {
+      this.execute(stmt.body);
+    }
+  }
+
   visitVariableExpr(expr: Expr.Variable): LoxValue {
     return this.environment.get(expr.name);
   }
@@ -115,6 +129,18 @@ export class Interpreter implements Visitor<LoxValue>, StmtVisitor<void> {
     }
 
     return null;
+  }
+
+  visitLogicalExpr(expr: Expr.Logical): LoxValue {
+    const left = this.evaluate(expr.left);
+
+    if (expr.operator.type === TokenType.OR) {
+      if (this.isTruthy(left)) return left;
+    } else {
+      if (!this.isTruthy(left)) return left;
+    }
+
+    return this.evaluate(expr.right);
   }
 
   private execute(stmt: Stmt): void {
