@@ -14,6 +14,7 @@ export interface Visitor<R> {
   visitGetExpr(expr: Expr.Get): R;
   visitSetExpr(expr: Expr.Set): R;
   visitThisExpr(expr: Expr.This): R;
+  visitSuperExpr(expr: Expr.Super): R;
 }
 
 export abstract class Expr {
@@ -153,6 +154,19 @@ export namespace Expr {
 
     accept<R>(visitor: Visitor<R>): R {
       return visitor.visitThisExpr(this);
+    }
+  }
+
+  export class Super extends Expr {
+    constructor(
+      public readonly keyword: Token,
+      public readonly method: Token,
+    ) {
+      super();
+    }
+
+    accept<R>(visitor: Visitor<R>): R {
+      return visitor.visitSuperExpr(this);
     }
   }
 }

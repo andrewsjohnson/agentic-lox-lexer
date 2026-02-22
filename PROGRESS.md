@@ -6,7 +6,7 @@
 
 ## Next Step
 
-**Step 11** — `steps/11-inheritance.md`
+**Step 12** — `steps/12-chunks-of-bytecode.md`
 
 ---
 
@@ -24,7 +24,7 @@
 | 08   | Functions                      | ✅ Complete |
 | 09   | Resolving and Binding          | ✅ Complete |
 | 10   | Classes                        | ✅ Complete |
-| 11   | Inheritance                    | ⬜ Pending  |
+| 11   | Inheritance                    | ✅ Complete |
 | 12   | Chunks of Bytecode             | ⬜ Pending  |
 | 13   | Virtual Machine                | ⬜ Pending  |
 | 14   | Scanning on Demand             | ⬜ Pending  |
