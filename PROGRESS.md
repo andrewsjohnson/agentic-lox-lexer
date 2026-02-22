@@ -6,7 +6,7 @@
 
 ## Next Step
 
-**Step 14** — `steps/14-scanning-on-demand.md`
+**Step 15** — `steps/15-compiling-expressions.md`
 
 ---
 
@@ -27,7 +27,7 @@
 | 11   | Inheritance                    | ✅ Complete |
 | 12   | Chunks of Bytecode             | ✅ Complete |
 | 13   | Virtual Machine                | ✅ Complete |
-| 14   | Scanning on Demand             | ⬜ Pending  |
+| 14   | Scanning on Demand             | ✅ Complete |
 | 15   | Compiling Expressions          | ⬜ Pending  |
 | 16   | Types of Values                | ⬜ Pending  |
 | 17   | Strings in VM                  | ⬜ Pending  |
