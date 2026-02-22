@@ -11,6 +11,9 @@ export interface Visitor<R> {
   visitAssignExpr(expr: Expr.Assign): R;
   visitLogicalExpr(expr: Expr.Logical): R;
   visitCallExpr(expr: Expr.Call): R;
+  visitGetExpr(expr: Expr.Get): R;
+  visitSetExpr(expr: Expr.Set): R;
+  visitThisExpr(expr: Expr.This): R;
 }
 
 export abstract class Expr {
@@ -113,6 +116,43 @@ export namespace Expr {
 
     accept<R>(visitor: Visitor<R>): R {
       return visitor.visitCallExpr(this);
+    }
+  }
+
+  export class Get extends Expr {
+    constructor(
+      public readonly object: Expr,
+      public readonly name: Token,
+    ) {
+      super();
+    }
+
+    accept<R>(visitor: Visitor<R>): R {
+      return visitor.visitGetExpr(this);
+    }
+  }
+
+  export class Set extends Expr {
+    constructor(
+      public readonly object: Expr,
+      public readonly name: Token,
+      public readonly value: Expr,
+    ) {
+      super();
+    }
+
+    accept<R>(visitor: Visitor<R>): R {
+      return visitor.visitSetExpr(this);
+    }
+  }
+
+  export class This extends Expr {
+    constructor(public readonly keyword: Token) {
+      super();
+    }
+
+    accept<R>(visitor: Visitor<R>): R {
+      return visitor.visitThisExpr(this);
     }
   }
 }
