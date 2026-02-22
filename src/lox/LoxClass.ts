@@ -7,11 +7,12 @@ import { LoxInstance } from './LoxInstance';
 export class LoxClass implements LoxCallable {
   constructor(
     public readonly name: string,
+    public readonly superclass: LoxClass | null,
     private readonly methods: Map<string, LoxFunction>,
   ) {}
 
   arity(): number {
-    const init = this.methods.get('init');
+    const init = this.findMethod('init');
     return init ? init.arity() : 0;
   }
 
@@ -23,7 +24,9 @@ export class LoxClass implements LoxCallable {
   }
 
   findMethod(name: string): LoxFunction | undefined {
-    return this.methods.get(name);
+    if (this.methods.has(name)) return this.methods.get(name);
+    if (this.superclass) return this.superclass.findMethod(name);
+    return undefined;
   }
 
   toString(): string {

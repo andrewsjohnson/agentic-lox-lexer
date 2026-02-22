@@ -24,6 +24,7 @@ enum FunctionType {
 enum ClassType {
   NONE,
   CLASS,
+  SUBCLASS,
 }
 
 export class Resolver implements Visitor<void>, StmtVisitor<void> {
@@ -108,6 +109,18 @@ export class Resolver implements Visitor<void>, StmtVisitor<void> {
     this.declare(stmt.name);
     this.define(stmt.name);
 
+    if (stmt.superclass !== null) {
+      if (stmt.superclass.name.lexeme === stmt.name.lexeme) {
+        this.errors.push(
+          new ResolveError(stmt.superclass.name, "A class can't inherit from itself."),
+        );
+      }
+      this.resolveExpr(stmt.superclass);
+      this.currentClass = ClassType.SUBCLASS;
+      this.beginScope();
+      this.scopes[this.scopes.length - 1].set('super', true);
+    }
+
     this.beginScope();
     this.scopes[this.scopes.length - 1].set('this', true);
 
@@ -119,6 +132,11 @@ export class Resolver implements Visitor<void>, StmtVisitor<void> {
     }
 
     this.endScope();
+
+    if (stmt.superclass !== null) {
+      this.endScope();
+    }
+
     this.currentClass = enclosingClass;
   }
 
@@ -192,6 +210,19 @@ export class Resolver implements Visitor<void>, StmtVisitor<void> {
         new ResolveError(expr.keyword, "Can't use 'this' outside of a class."),
       );
       return;
+    }
+    this.resolveLocal(expr, expr.keyword);
+  }
+
+  visitSuperExpr(expr: Expr.Super): void {
+    if (this.currentClass === ClassType.NONE) {
+      this.errors.push(
+        new ResolveError(expr.keyword, "Can't use 'super' outside of a class."),
+      );
+    } else if (this.currentClass !== ClassType.SUBCLASS) {
+      this.errors.push(
+        new ResolveError(expr.keyword, "Can't use 'super' in a class with no superclass."),
+      );
     }
     this.resolveLocal(expr, expr.keyword);
   }

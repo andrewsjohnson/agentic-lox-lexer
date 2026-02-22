@@ -50,6 +50,10 @@ export class AstPrinter implements Visitor<string> {
     return 'this';
   }
 
+  visitSuperExpr(expr: Expr.Super): string {
+    return `(super ${expr.method.lexeme})`;
+  }
+
   private parenthesize(name: string, ...exprs: Expr[]): string {
     return `(${name} ${exprs.map(e => e.accept(this)).join(' ')})`;
   }

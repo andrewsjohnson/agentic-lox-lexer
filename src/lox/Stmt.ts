@@ -118,6 +118,7 @@ export namespace Stmt {
   export class Class extends Stmt {
     constructor(
       public readonly name: Token,
+      public readonly superclass: Expr.Variable | null,
       public readonly methods: Stmt.Function[],
     ) {
       super();

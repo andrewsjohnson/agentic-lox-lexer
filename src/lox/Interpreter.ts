@@ -75,13 +75,33 @@ export class Interpreter implements Visitor<LoxValue>, StmtVisitor<void> {
   }
 
   visitClassStmt(stmt: Stmt.Class): void {
+    let superclass: LoxClass | null = null;
+    if (stmt.superclass !== null) {
+      const superVal = this.evaluate(stmt.superclass);
+      if (!(superVal instanceof LoxClass)) {
+        throw new RuntimeError(stmt.superclass.name, 'Superclass must be a class.');
+      }
+      superclass = superVal;
+    }
+
     this.environment.define(stmt.name.lexeme, null);
+
+    if (superclass !== null) {
+      this.environment = new Environment(this.environment);
+      this.environment.define('super', superclass);
+    }
+
     const methods = new Map<string, LoxFunction>();
     for (const method of stmt.methods) {
       const fn = new LoxFunction(method, this.environment, method.name.lexeme === 'init');
       methods.set(method.name.lexeme, fn);
     }
-    const klass = new LoxClass(stmt.name.lexeme, methods);
+    const klass = new LoxClass(stmt.name.lexeme, superclass, methods);
+
+    if (superclass !== null) {
+      this.environment = this.environment.enclosing!;
+    }
+
     this.environment.assign(stmt.name, klass);
   }
 
@@ -220,6 +240,17 @@ export class Interpreter implements Visitor<LoxValue>, StmtVisitor<void> {
 
   visitThisExpr(expr: Expr.This): LoxValue {
     return this.lookUpVariable(expr.keyword, expr);
+  }
+
+  visitSuperExpr(expr: Expr.Super): LoxValue {
+    const distance = this.locals.get(expr)!;
+    const superclass = this.environment.getAt(distance, 'super') as LoxClass;
+    const object = this.environment.getAt(distance - 1, 'this') as LoxInstance;
+    const method = superclass.findMethod(expr.method.lexeme);
+    if (!method) {
+      throw new RuntimeError(expr.method, `Undefined property '${expr.method.lexeme}'.`);
+    }
+    return method.bind(object);
   }
 
   private execute(stmt: Stmt): void {
