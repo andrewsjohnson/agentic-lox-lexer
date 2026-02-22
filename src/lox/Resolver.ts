@@ -18,11 +18,18 @@ type Scope = Map<string, boolean>;
 enum FunctionType {
   NONE,
   FUNCTION,
+  INITIALIZER,
+}
+
+enum ClassType {
+  NONE,
+  CLASS,
 }
 
 export class Resolver implements Visitor<void>, StmtVisitor<void> {
   private scopes: Scope[] = [];
   private currentFunction: FunctionType = FunctionType.NONE;
+  private currentClass: ClassType = ClassType.NONE;
   public readonly errors: ResolveError[] = [];
 
   constructor(private readonly interpreter: Interpreter) {}
@@ -85,8 +92,34 @@ export class Resolver implements Visitor<void>, StmtVisitor<void> {
       );
     }
     if (stmt.value !== null) {
+      if (this.currentFunction === FunctionType.INITIALIZER) {
+        this.errors.push(
+          new ResolveError(stmt.keyword, "Can't return a value from an initializer."),
+        );
+      }
       this.resolveExpr(stmt.value);
     }
+  }
+
+  visitClassStmt(stmt: Stmt.Class): void {
+    const enclosingClass = this.currentClass;
+    this.currentClass = ClassType.CLASS;
+
+    this.declare(stmt.name);
+    this.define(stmt.name);
+
+    this.beginScope();
+    this.scopes[this.scopes.length - 1].set('this', true);
+
+    for (const method of stmt.methods) {
+      const declaration = method.name.lexeme === 'init'
+        ? FunctionType.INITIALIZER
+        : FunctionType.FUNCTION;
+      this.resolveFunction(method, declaration);
+    }
+
+    this.endScope();
+    this.currentClass = enclosingClass;
   }
 
   visitWhileStmt(stmt: Stmt.While): void {
@@ -142,6 +175,25 @@ export class Resolver implements Visitor<void>, StmtVisitor<void> {
 
   visitUnaryExpr(expr: Expr.Unary): void {
     this.resolveExpr(expr.right);
+  }
+
+  visitGetExpr(expr: Expr.Get): void {
+    this.resolveExpr(expr.object);
+  }
+
+  visitSetExpr(expr: Expr.Set): void {
+    this.resolveExpr(expr.value);
+    this.resolveExpr(expr.object);
+  }
+
+  visitThisExpr(expr: Expr.This): void {
+    if (this.currentClass === ClassType.NONE) {
+      this.errors.push(
+        new ResolveError(expr.keyword, "Can't use 'this' outside of a class."),
+      );
+      return;
+    }
+    this.resolveLocal(expr, expr.keyword);
   }
 
   // --- Helper methods ---

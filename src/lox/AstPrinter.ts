@@ -38,6 +38,18 @@ export class AstPrinter implements Visitor<string> {
     return this.parenthesize('call', expr.callee, ...expr.args);
   }
 
+  visitGetExpr(expr: Expr.Get): string {
+    return `(get ${expr.object.accept(this)} ${expr.name.lexeme})`;
+  }
+
+  visitSetExpr(expr: Expr.Set): string {
+    return `(set ${expr.object.accept(this)} ${expr.name.lexeme} ${expr.value.accept(this)})`;
+  }
+
+  visitThisExpr(_expr: Expr.This): string {
+    return 'this';
+  }
+
   private parenthesize(name: string, ...exprs: Expr[]): string {
     return `(${name} ${exprs.map(e => e.accept(this)).join(' ')})`;
   }

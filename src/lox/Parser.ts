@@ -30,6 +30,7 @@ export class Parser {
 
   private declaration(): Stmt | null {
     try {
+      if (this.match(TokenType.CLASS)) return this.classDeclaration();
       if (this.match(TokenType.FUN)) return this.funDeclaration();
       if (this.match(TokenType.VAR)) return this.varDeclaration();
       return this.statement();
@@ -42,9 +43,24 @@ export class Parser {
     }
   }
 
+  private classDeclaration(): Stmt {
+    const name = this.consume(TokenType.IDENTIFIER, "Expect class name.");
+    this.consume(TokenType.LEFT_BRACE, "Expect '{' before class body.");
+    const methods: Stmt.Function[] = [];
+    while (!this.check(TokenType.RIGHT_BRACE) && !this.isAtEnd()) {
+      methods.push(this.function_('method'));
+    }
+    this.consume(TokenType.RIGHT_BRACE, "Expect '}' after class body.");
+    return new Stmt.Class(name, methods);
+  }
+
   private funDeclaration(): Stmt {
-    const name = this.consume(TokenType.IDENTIFIER, "Expect function name.");
-    this.consume(TokenType.LEFT_PAREN, "Expect '(' after function name.");
+    return this.function_('function');
+  }
+
+  private function_(kind: string): Stmt.Function {
+    const name = this.consume(TokenType.IDENTIFIER, `Expect ${kind} name.`);
+    this.consume(TokenType.LEFT_PAREN, `Expect '(' after ${kind} name.`);
     const params: Token[] = [];
     if (!this.check(TokenType.RIGHT_PAREN)) {
       do {
@@ -52,7 +68,7 @@ export class Parser {
       } while (this.match(TokenType.COMMA));
     }
     this.consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
-    this.consume(TokenType.LEFT_BRACE, "Expect '{' before function body.");
+    this.consume(TokenType.LEFT_BRACE, `Expect '{' before ${kind} body.`);
     const body = this.block();
     return new Stmt.Function(name, params, body);
   }
@@ -186,6 +202,10 @@ export class Parser {
         return new Expr.Assign(expr.name, value);
       }
 
+      if (expr instanceof Expr.Get) {
+        return new Expr.Set(expr.object, expr.name, value);
+      }
+
       this.error(equals, 'Invalid assignment target.');
     }
 
@@ -284,16 +304,23 @@ export class Parser {
   private call(): Expr {
     let expr = this.primary();
 
-    while (this.match(TokenType.LEFT_PAREN)) {
-      const paren = this.previous();
-      const args: Expr[] = [];
-      if (!this.check(TokenType.RIGHT_PAREN)) {
-        do {
-          args.push(this.expression());
-        } while (this.match(TokenType.COMMA));
+    while (true) {
+      if (this.match(TokenType.LEFT_PAREN)) {
+        const paren = this.previous();
+        const args: Expr[] = [];
+        if (!this.check(TokenType.RIGHT_PAREN)) {
+          do {
+            args.push(this.expression());
+          } while (this.match(TokenType.COMMA));
+        }
+        this.consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.");
+        expr = new Expr.Call(expr, paren, args);
+      } else if (this.match(TokenType.DOT)) {
+        const name = this.consume(TokenType.IDENTIFIER, "Expect property name after '.'.");
+        expr = new Expr.Get(expr, name);
+      } else {
+        break;
       }
-      this.consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.");
-      expr = new Expr.Call(expr, paren, args);
     }
 
     return expr;
@@ -307,6 +334,8 @@ export class Parser {
     if (this.match(TokenType.NUMBER, TokenType.STRING)) {
       return new Expr.Literal(this.previous().literal as LoxLiteral);
     }
+
+    if (this.match(TokenType.THIS)) return new Expr.This(this.previous());
 
     if (this.match(TokenType.IDENTIFIER)) {
       return new Expr.Variable(this.previous());
