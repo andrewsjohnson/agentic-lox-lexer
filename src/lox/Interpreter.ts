@@ -1,13 +1,49 @@
 import { Expr, Visitor } from './Expr';
+import { Stmt, StmtVisitor } from './Stmt';
 import { Token } from './Token';
 import { TokenType } from './TokenType';
 import { RuntimeError } from './RuntimeError';
+import { Environment } from './Environment';
 
 export type LoxValue = null | boolean | number | string;
 
-export class Interpreter implements Visitor<LoxValue> {
-  interpret(expr: Expr): LoxValue {
-    return this.evaluate(expr);
+export class Interpreter implements Visitor<LoxValue>, StmtVisitor<void> {
+  private environment = new Environment();
+
+  interpret(statements: Stmt[]): void {
+    for (const statement of statements) {
+      this.execute(statement);
+    }
+  }
+
+  visitExpressionStmt(stmt: Stmt.Expression): void {
+    this.evaluate(stmt.expression);
+  }
+
+  visitPrintStmt(stmt: Stmt.Print): void {
+    const value = this.evaluate(stmt.expression);
+    console.log(this.stringify(value));
+  }
+
+  visitVarStmt(stmt: Stmt.Var): void {
+    const value: LoxValue = stmt.initializer !== null
+      ? this.evaluate(stmt.initializer)
+      : null;
+    this.environment.define(stmt.name.lexeme, value);
+  }
+
+  visitBlockStmt(stmt: Stmt.Block): void {
+    this.executeBlock(stmt.statements, new Environment(this.environment));
+  }
+
+  visitVariableExpr(expr: Expr.Variable): LoxValue {
+    return this.environment.get(expr.name);
+  }
+
+  visitAssignExpr(expr: Expr.Assign): LoxValue {
+    const value = this.evaluate(expr.value);
+    this.environment.assign(expr.name, value);
+    return value;
   }
 
   visitLiteralExpr(expr: Expr.Literal): LoxValue {
@@ -81,7 +117,23 @@ export class Interpreter implements Visitor<LoxValue> {
     return null;
   }
 
-  private evaluate(expr: Expr): LoxValue {
+  private execute(stmt: Stmt): void {
+    stmt.accept(this);
+  }
+
+  private executeBlock(statements: Stmt[], environment: Environment): void {
+    const previous = this.environment;
+    try {
+      this.environment = environment;
+      for (const statement of statements) {
+        this.execute(statement);
+      }
+    } finally {
+      this.environment = previous;
+    }
+  }
+
+  evaluate(expr: Expr): LoxValue {
     return expr.accept(this);
   }
 

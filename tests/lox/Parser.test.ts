@@ -2,12 +2,17 @@ import { Scanner } from '../../src/lox/Scanner';
 import { Parser } from '../../src/lox/Parser';
 import { AstPrinter } from '../../src/lox/AstPrinter';
 import { Expr } from '../../src/lox/Expr';
+import { Stmt } from '../../src/lox/Stmt';
 
 function parse(source: string): Expr | null {
-  const scanner = new Scanner(source);
+  const scanner = new Scanner(source + ';');
   const tokens = scanner.scanTokens();
   const parser = new Parser(tokens);
-  return parser.parse();
+  const stmts = parser.parse();
+  if (parser.errors.length > 0 || stmts.length === 0) return null;
+  const stmt = stmts[0];
+  if (stmt instanceof Stmt.Expression) return stmt.expression;
+  return null;
 }
 
 function parseAndPrint(source: string): string {

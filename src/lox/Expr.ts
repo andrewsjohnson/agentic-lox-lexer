@@ -7,6 +7,8 @@ export interface Visitor<R> {
   visitGroupingExpr(expr: Expr.Grouping): R;
   visitLiteralExpr(expr: Expr.Literal): R;
   visitUnaryExpr(expr: Expr.Unary): R;
+  visitVariableExpr(expr: Expr.Variable): R;
+  visitAssignExpr(expr: Expr.Assign): R;
 }
 
 export abstract class Expr {
@@ -58,6 +60,29 @@ export namespace Expr {
 
     accept<R>(visitor: Visitor<R>): R {
       return visitor.visitUnaryExpr(this);
+    }
+  }
+
+  export class Variable extends Expr {
+    constructor(public readonly name: Token) {
+      super();
+    }
+
+    accept<R>(visitor: Visitor<R>): R {
+      return visitor.visitVariableExpr(this);
+    }
+  }
+
+  export class Assign extends Expr {
+    constructor(
+      public readonly name: Token,
+      public readonly value: Expr,
+    ) {
+      super();
+    }
+
+    accept<R>(visitor: Visitor<R>): R {
+      return visitor.visitAssignExpr(this);
     }
   }
 }

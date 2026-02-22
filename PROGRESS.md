@@ -6,7 +6,7 @@
 
 ## Next Step
 
-**Step 06** — `steps/06-statements-and-state.md`
+**Step 07** — `steps/07-control-flow.md`
 
 ---
 
@@ -19,7 +19,7 @@
 | 03   | AST Representation             | ✅ Complete |
 | 04   | Parsing Expressions            | ✅ Complete  |
 | 05   | Evaluating Expressions         | ✅ Complete |
-| 06   | Statements and State           | ⬜ Pending  |
+| 06   | Statements and State           | ✅ Complete |
 | 07   | Control Flow                   | ⬜ Pending  |
 | 08   | Functions                      | ⬜ Pending  |
 | 09   | Resolving and Binding          | ⬜ Pending  |
