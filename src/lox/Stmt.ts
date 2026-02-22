@@ -8,6 +8,8 @@ export interface StmtVisitor<R> {
   visitBlockStmt(stmt: Stmt.Block): R;
   visitIfStmt(stmt: Stmt.If): R;
   visitWhileStmt(stmt: Stmt.While): R;
+  visitFunctionStmt(stmt: Stmt.Function): R;
+  visitReturnStmt(stmt: Stmt.Return): R;
 }
 
 export abstract class Stmt {
@@ -82,6 +84,33 @@ export namespace Stmt {
 
     accept<R>(visitor: StmtVisitor<R>): R {
       return visitor.visitWhileStmt(this);
+    }
+  }
+
+  export class Function extends Stmt {
+    constructor(
+      public readonly name: Token,
+      public readonly params: Token[],
+      public readonly body: Stmt[],
+    ) {
+      super();
+    }
+
+    accept<R>(visitor: StmtVisitor<R>): R {
+      return visitor.visitFunctionStmt(this);
+    }
+  }
+
+  export class Return extends Stmt {
+    constructor(
+      public readonly keyword: Token,
+      public readonly value: Expr | null,
+    ) {
+      super();
+    }
+
+    accept<R>(visitor: StmtVisitor<R>): R {
+      return visitor.visitReturnStmt(this);
     }
   }
 }

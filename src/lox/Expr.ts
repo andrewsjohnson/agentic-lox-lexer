@@ -10,6 +10,7 @@ export interface Visitor<R> {
   visitVariableExpr(expr: Expr.Variable): R;
   visitAssignExpr(expr: Expr.Assign): R;
   visitLogicalExpr(expr: Expr.Logical): R;
+  visitCallExpr(expr: Expr.Call): R;
 }
 
 export abstract class Expr {
@@ -98,6 +99,20 @@ export namespace Expr {
 
     accept<R>(visitor: Visitor<R>): R {
       return visitor.visitLogicalExpr(this);
+    }
+  }
+
+  export class Call extends Expr {
+    constructor(
+      public readonly callee: Expr,
+      public readonly paren: Token,
+      public readonly args: Expr[],
+    ) {
+      super();
+    }
+
+    accept<R>(visitor: Visitor<R>): R {
+      return visitor.visitCallExpr(this);
     }
   }
 }

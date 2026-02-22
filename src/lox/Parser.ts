@@ -30,6 +30,7 @@ export class Parser {
 
   private declaration(): Stmt | null {
     try {
+      if (this.match(TokenType.FUN)) return this.funDeclaration();
       if (this.match(TokenType.VAR)) return this.varDeclaration();
       return this.statement();
     } catch (e) {
@@ -39,6 +40,21 @@ export class Parser {
       }
       throw e;
     }
+  }
+
+  private funDeclaration(): Stmt {
+    const name = this.consume(TokenType.IDENTIFIER, "Expect function name.");
+    this.consume(TokenType.LEFT_PAREN, "Expect '(' after function name.");
+    const params: Token[] = [];
+    if (!this.check(TokenType.RIGHT_PAREN)) {
+      do {
+        params.push(this.consume(TokenType.IDENTIFIER, "Expect parameter name."));
+      } while (this.match(TokenType.COMMA));
+    }
+    this.consume(TokenType.RIGHT_PAREN, "Expect ')' after parameters.");
+    this.consume(TokenType.LEFT_BRACE, "Expect '{' before function body.");
+    const body = this.block();
+    return new Stmt.Function(name, params, body);
   }
 
   private varDeclaration(): Stmt {
@@ -55,6 +71,7 @@ export class Parser {
     if (this.match(TokenType.IF)) return this.ifStatement();
     if (this.match(TokenType.WHILE)) return this.whileStatement();
     if (this.match(TokenType.FOR)) return this.forStatement();
+    if (this.match(TokenType.RETURN)) return this.returnStatement();
     if (this.match(TokenType.LEFT_BRACE)) return new Stmt.Block(this.block());
     return this.expressionStatement();
   }
@@ -129,6 +146,13 @@ export class Parser {
     }
 
     return body;
+  }
+
+  private returnStatement(): Stmt {
+    const keyword = this.previous();
+    const value: Expr | null = this.check(TokenType.SEMICOLON) ? null : this.expression();
+    this.consume(TokenType.SEMICOLON, "Expect ';' after return value.");
+    return new Stmt.Return(keyword, value);
   }
 
   private block(): Stmt[] {
@@ -254,7 +278,25 @@ export class Parser {
       return new Expr.Unary(operator, right);
     }
 
-    return this.primary();
+    return this.call();
+  }
+
+  private call(): Expr {
+    let expr = this.primary();
+
+    while (this.match(TokenType.LEFT_PAREN)) {
+      const paren = this.previous();
+      const args: Expr[] = [];
+      if (!this.check(TokenType.RIGHT_PAREN)) {
+        do {
+          args.push(this.expression());
+        } while (this.match(TokenType.COMMA));
+      }
+      this.consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.");
+      expr = new Expr.Call(expr, paren, args);
+    }
+
+    return expr;
   }
 
   private primary(): Expr {

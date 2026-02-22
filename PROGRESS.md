@@ -6,7 +6,7 @@
 
 ## Next Step
 
-**Step 08** — `steps/08-functions.md`
+**Step 09** — `steps/09-resolving-and-binding.md`
 
 ---
 
@@ -21,7 +21,7 @@
 | 05   | Evaluating Expressions         | ✅ Complete |
 | 06   | Statements and State           | ✅ Complete |
 | 07   | Control Flow                   | ✅ Complete |
-| 08   | Functions                      | ⬜ Pending  |
+| 08   | Functions                      | ✅ Complete |
 | 09   | Resolving and Binding          | ⬜ Pending  |
 | 10   | Classes                        | ⬜ Pending  |
 | 11   | Inheritance                    | ⬜ Pending  |
