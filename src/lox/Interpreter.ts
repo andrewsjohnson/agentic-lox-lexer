@@ -4,11 +4,23 @@ import { Token } from './Token';
 import { TokenType } from './TokenType';
 import { RuntimeError } from './RuntimeError';
 import { Environment } from './Environment';
+import { LoxCallable, isLoxCallable } from './LoxCallable';
+import { Return } from './Return';
+import { LoxFunction } from './LoxFunction';
 
-export type LoxValue = null | boolean | number | string;
+export type LoxValue = null | boolean | number | string | LoxCallable;
 
 export class Interpreter implements Visitor<LoxValue>, StmtVisitor<void> {
-  private environment = new Environment();
+  public readonly globals = new Environment();
+  private environment = this.globals;
+
+  constructor() {
+    this.globals.define('clock', {
+      arity: () => 0,
+      call: () => Date.now() / 1000,
+      toString: () => '<native fn>',
+    } satisfies LoxCallable);
+  }
 
   interpret(statements: Stmt[]): void {
     for (const statement of statements) {
@@ -48,6 +60,16 @@ export class Interpreter implements Visitor<LoxValue>, StmtVisitor<void> {
     while (this.isTruthy(this.evaluate(stmt.condition))) {
       this.execute(stmt.body);
     }
+  }
+
+  visitFunctionStmt(stmt: Stmt.Function): void {
+    const fn = new LoxFunction(stmt, this.environment);
+    this.environment.define(stmt.name.lexeme, fn);
+  }
+
+  visitReturnStmt(stmt: Stmt.Return): void {
+    const value = stmt.value ? this.evaluate(stmt.value) : null;
+    throw new Return(value);
   }
 
   visitVariableExpr(expr: Expr.Variable): LoxValue {
@@ -143,11 +165,25 @@ export class Interpreter implements Visitor<LoxValue>, StmtVisitor<void> {
     return this.evaluate(expr.right);
   }
 
+  visitCallExpr(expr: Expr.Call): LoxValue {
+    const callee = this.evaluate(expr.callee);
+    const args = expr.args.map(a => this.evaluate(a));
+
+    if (!isLoxCallable(callee)) {
+      throw new RuntimeError(expr.paren, 'Can only call functions and classes.');
+    }
+    if (args.length !== callee.arity()) {
+      throw new RuntimeError(expr.paren,
+        `Expected ${callee.arity()} arguments but got ${args.length}.`);
+    }
+    return callee.call(this, args);
+  }
+
   private execute(stmt: Stmt): void {
     stmt.accept(this);
   }
 
-  private executeBlock(statements: Stmt[], environment: Environment): void {
+  public executeBlock(statements: Stmt[], environment: Environment): void {
     const previous = this.environment;
     try {
       this.environment = environment;
@@ -197,6 +233,8 @@ export class Interpreter implements Visitor<LoxValue>, StmtVisitor<void> {
       if (text.endsWith('.0')) return text.slice(0, -2);
       return text;
     }
-    return value;
+    if (typeof value === 'string') return value;
+    if (isLoxCallable(value)) return value.toString();
+    return '';
   }
 }
