@@ -6,7 +6,7 @@
 
 ## Next Step
 
-**Step 10** — `steps/10-classes.md`
+**Step 13** — `steps/13-virtual-machine.md`
 
 ---
 
@@ -25,7 +25,7 @@
 | 09   | Resolving and Binding          | ✅ Complete |
 | 10   | Classes                        | ⬜ Pending  |
 | 11   | Inheritance                    | ⬜ Pending  |
-| 12   | Chunks of Bytecode             | ⬜ Pending  |
+| 12   | Chunks of Bytecode             | ✅ Complete |
 | 13   | Virtual Machine                | ⬜ Pending  |
 | 14   | Scanning on Demand             | ⬜ Pending  |
 | 15   | Compiling Expressions          | ⬜ Pending  |
