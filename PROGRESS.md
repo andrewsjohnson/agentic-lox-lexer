@@ -6,7 +6,7 @@
 
 ## Next Step
 
-**Step 13** — `steps/13-virtual-machine.md`
+**Step 14** — `steps/14-scanning-on-demand.md`
 
 ---
 
@@ -26,7 +26,7 @@
 | 10   | Classes                        | ✅ Complete |
 | 11   | Inheritance                    | ✅ Complete |
 | 12   | Chunks of Bytecode             | ✅ Complete |
-| 13   | Virtual Machine                | ⬜ Pending  |
+| 13   | Virtual Machine                | ✅ Complete |
 | 14   | Scanning on Demand             | ⬜ Pending  |
 | 15   | Compiling Expressions          | ⬜ Pending  |
 | 16   | Types of Values                | ⬜ Pending  |
