@@ -3,6 +3,7 @@ import * as readline from 'readline';
 import { Scanner } from './Scanner';
 import { Parser } from './Parser';
 import { Interpreter } from './Interpreter';
+import { Resolver } from './Resolver';
 import { RuntimeError } from './RuntimeError';
 
 const interpreter = new Interpreter();
@@ -17,6 +18,17 @@ function run(source: string): void {
 
   if (parser.errors.length > 0) {
     for (const err of parser.errors) {
+      console.error(`[line ${err.token.line}] Error: ${err.message}`);
+    }
+    hadError = true;
+    return;
+  }
+
+  const resolver = new Resolver(interpreter);
+  resolver.resolve(statements);
+
+  if (resolver.errors.length > 0) {
+    for (const err of resolver.errors) {
       console.error(`[line ${err.token.line}] Error: ${err.message}`);
     }
     hadError = true;

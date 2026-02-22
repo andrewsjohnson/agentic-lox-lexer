@@ -1,6 +1,7 @@
 import { Scanner } from '../../src/lox/Scanner';
 import { Parser } from '../../src/lox/Parser';
 import { Interpreter } from '../../src/lox/Interpreter';
+import { Resolver } from '../../src/lox/Resolver';
 
 function run(source: string): string[] {
   const output: string[] = [];
@@ -13,6 +14,8 @@ function run(source: string): string[] {
     const parser = new Parser(tokens);
     const stmts = parser.parse();
     const interpreter = new Interpreter();
+    const resolver = new Resolver(interpreter);
+    resolver.resolve(stmts);
     interpreter.interpret(stmts);
   } finally {
     console.log = originalLog;

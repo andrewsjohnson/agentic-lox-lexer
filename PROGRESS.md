@@ -6,7 +6,7 @@
 
 ## Next Step
 
-**Step 09** — `steps/09-resolving-and-binding.md`
+**Step 10** — `steps/10-classes.md`
 
 ---
 
@@ -22,7 +22,7 @@
 | 06   | Statements and State           | ✅ Complete |
 | 07   | Control Flow                   | ✅ Complete |
 | 08   | Functions                      | ✅ Complete |
-| 09   | Resolving and Binding          | ⬜ Pending  |
+| 09   | Resolving and Binding          | ✅ Complete |
 | 10   | Classes                        | ⬜ Pending  |
 | 11   | Inheritance                    | ⬜ Pending  |
 | 12   | Chunks of Bytecode             | ⬜ Pending  |

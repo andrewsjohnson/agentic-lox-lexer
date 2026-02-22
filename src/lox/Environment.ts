@@ -3,7 +3,7 @@ import { RuntimeError } from './RuntimeError';
 import { LoxValue } from './Interpreter';
 
 export class Environment {
-  private values = new Map<string, LoxValue>();
+  readonly values = new Map<string, LoxValue>();
 
   constructor(public readonly enclosing: Environment | null = null) {}
 
@@ -27,5 +27,19 @@ export class Environment {
       return;
     }
     throw new RuntimeError(name, `Undefined variable '${name.lexeme}'.`);
+  }
+
+  getAt(distance: number, name: string): LoxValue {
+    return this.ancestor(distance).values.get(name) ?? null;
+  }
+
+  assignAt(distance: number, name: Token, value: LoxValue): void {
+    this.ancestor(distance).values.set(name.lexeme, value);
+  }
+
+  private ancestor(distance: number): Environment {
+    let env: Environment = this;
+    for (let i = 0; i < distance; i++) env = env.enclosing!;
+    return env;
   }
 }
