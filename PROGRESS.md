@@ -6,7 +6,7 @@
 
 ## Next Step
 
-**Step 04** — `steps/04-parsing-expressions.md`
+**Step 05** — `steps/05-evaluating-expressions.md`
 
 ---
 
@@ -17,7 +17,7 @@
 | 01   | Repository Setup               | ✅ Complete |
 | 02   | Scanning / Lexer               | ✅ Complete |
 | 03   | AST Representation             | ✅ Complete |
-| 04   | Parsing Expressions            | ⬜ Pending  |
+| 04   | Parsing Expressions            | ✅ Complete  |
 | 05   | Evaluating Expressions         | ⬜ Pending  |
 | 06   | Statements and State           | ⬜ Pending  |
 | 07   | Control Flow                   | ⬜ Pending  |
