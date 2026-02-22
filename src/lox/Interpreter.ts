@@ -7,8 +7,10 @@ import { Environment } from './Environment';
 import { LoxCallable, isLoxCallable } from './LoxCallable';
 import { Return } from './Return';
 import { LoxFunction } from './LoxFunction';
+import { LoxClass } from './LoxClass';
+import { LoxInstance } from './LoxInstance';
 
-export type LoxValue = null | boolean | number | string | LoxCallable;
+export type LoxValue = null | boolean | number | string | LoxCallable | LoxInstance;
 
 export class Interpreter implements Visitor<LoxValue>, StmtVisitor<void> {
   public readonly globals = new Environment();
@@ -68,8 +70,19 @@ export class Interpreter implements Visitor<LoxValue>, StmtVisitor<void> {
   }
 
   visitFunctionStmt(stmt: Stmt.Function): void {
-    const fn = new LoxFunction(stmt, this.environment);
+    const fn = new LoxFunction(stmt, this.environment, false);
     this.environment.define(stmt.name.lexeme, fn);
+  }
+
+  visitClassStmt(stmt: Stmt.Class): void {
+    this.environment.define(stmt.name.lexeme, null);
+    const methods = new Map<string, LoxFunction>();
+    for (const method of stmt.methods) {
+      const fn = new LoxFunction(method, this.environment, method.name.lexeme === 'init');
+      methods.set(method.name.lexeme, fn);
+    }
+    const klass = new LoxClass(stmt.name.lexeme, methods);
+    this.environment.assign(stmt.name, klass);
   }
 
   visitReturnStmt(stmt: Stmt.Return): void {
@@ -189,6 +202,26 @@ export class Interpreter implements Visitor<LoxValue>, StmtVisitor<void> {
     return callee.call(this, args);
   }
 
+  visitGetExpr(expr: Expr.Get): LoxValue {
+    const object = this.evaluate(expr.object);
+    if (object instanceof LoxInstance) return object.get(expr.name);
+    throw new RuntimeError(expr.name, 'Only instances have properties.');
+  }
+
+  visitSetExpr(expr: Expr.Set): LoxValue {
+    const object = this.evaluate(expr.object);
+    if (!(object instanceof LoxInstance)) {
+      throw new RuntimeError(expr.name, 'Only instances have fields.');
+    }
+    const value = this.evaluate(expr.value);
+    object.set(expr.name, value);
+    return value;
+  }
+
+  visitThisExpr(expr: Expr.This): LoxValue {
+    return this.lookUpVariable(expr.keyword, expr);
+  }
+
   private execute(stmt: Stmt): void {
     stmt.accept(this);
   }
@@ -252,6 +285,7 @@ export class Interpreter implements Visitor<LoxValue>, StmtVisitor<void> {
       return text;
     }
     if (typeof value === 'string') return value;
+    if (value instanceof LoxInstance) return value.toString();
     if (isLoxCallable(value)) return value.toString();
     return '';
   }

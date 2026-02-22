@@ -6,7 +6,7 @@
 
 ## Next Step
 
-**Step 10** — `steps/10-classes.md`
+**Step 11** — `steps/11-inheritance.md`
 
 ---
 
@@ -23,7 +23,7 @@
 | 07   | Control Flow                   | ✅ Complete |
 | 08   | Functions                      | ✅ Complete |
 | 09   | Resolving and Binding          | ✅ Complete |
-| 10   | Classes                        | ⬜ Pending  |
+| 10   | Classes                        | ✅ Complete |
 | 11   | Inheritance                    | ⬜ Pending  |
 | 12   | Chunks of Bytecode             | ⬜ Pending  |
 | 13   | Virtual Machine                | ⬜ Pending  |

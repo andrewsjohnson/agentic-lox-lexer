@@ -10,6 +10,7 @@ export interface StmtVisitor<R> {
   visitWhileStmt(stmt: Stmt.While): R;
   visitFunctionStmt(stmt: Stmt.Function): R;
   visitReturnStmt(stmt: Stmt.Return): R;
+  visitClassStmt(stmt: Stmt.Class): R;
 }
 
 export abstract class Stmt {
@@ -111,6 +112,19 @@ export namespace Stmt {
 
     accept<R>(visitor: StmtVisitor<R>): R {
       return visitor.visitReturnStmt(this);
+    }
+  }
+
+  export class Class extends Stmt {
+    constructor(
+      public readonly name: Token,
+      public readonly methods: Stmt.Function[],
+    ) {
+      super();
+    }
+
+    accept<R>(visitor: StmtVisitor<R>): R {
+      return visitor.visitClassStmt(this);
     }
   }
 }
