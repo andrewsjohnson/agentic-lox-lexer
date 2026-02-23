@@ -1,12 +1,12 @@
 # Implementation Progress
 
-**Last updated:** 2026-02-22
+**Last updated:** 2026-02-23
 
 ---
 
 ## Next Step
 
-**Step 15** — `steps/15-compiling-expressions.md`
+**Step 16** — `steps/16-types-of-values.md`
 
 ---
 
@@ -28,7 +28,7 @@
 | 12   | Chunks of Bytecode             | ✅ Complete |
 | 13   | Virtual Machine                | ✅ Complete |
 | 14   | Scanning on Demand             | ✅ Complete |
-| 15   | Compiling Expressions          | ⬜ Pending  |
+| 15   | Compiling Expressions          | ✅ Complete |
 | 16   | Types of Values                | ⬜ Pending  |
 | 17   | Strings in VM                  | ⬜ Pending  |
 | 18   | Hash Tables                    | ⬜ Pending  |

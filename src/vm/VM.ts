@@ -1,4 +1,5 @@
 import { Chunk } from './Chunk';
+import { Compiler } from './Compiler';
 import { OpCode } from './OpCode';
 import type { VmValue } from './Value';
 import { printValue, valuesEqual } from './Value';
@@ -13,6 +14,13 @@ export class VM {
   private chunk!: Chunk;
   private ip: number = 0;           // instruction pointer
   private stack: VmValue[] = [];    // value stack
+
+  interpretSource(source: string): InterpretResult {
+    const compiler = new Compiler();
+    const chunk = compiler.compile(source);
+    if (!chunk) return InterpretResult.COMPILE_ERROR;
+    return this.interpret(chunk);
+  }
 
   interpret(chunk: Chunk): InterpretResult {
     this.chunk = chunk;
