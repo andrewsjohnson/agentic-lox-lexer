@@ -6,7 +6,7 @@
 
 ## Next Step
 
-**Step 16** — `steps/16-types-of-values.md`
+**Step 17** — `steps/17-strings-in-vm.md`
 
 ---
 
@@ -29,7 +29,7 @@
 | 13   | Virtual Machine                | ✅ Complete |
 | 14   | Scanning on Demand             | ✅ Complete |
 | 15   | Compiling Expressions          | ✅ Complete |
-| 16   | Types of Values                | ⬜ Pending  |
+| 16   | Types of Values                | ✅ Complete |
 | 17   | Strings in VM                  | ⬜ Pending  |
 | 18   | Hash Tables                    | ⬜ Pending  |
 | 19   | Global Variables (VM)          | ⬜ Pending  |
